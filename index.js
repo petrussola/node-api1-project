@@ -9,9 +9,40 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+server.post("/api/users", createNewUser);
 server.get("/api/users/:id", getUserById);
 server.get("/api/users", getAllUsers);
 server.get("*", handleDefaultRequest);
+
+function createNewUser(req, res) {
+  console.log(req);
+
+  if (!req.body.name || !req.body.bio) {
+    res
+      .status(400)
+      .json({ errorMessage: "Please provide name and bio for the user." });
+  }
+
+  const user = {
+    name: req.body.name,
+    bio: req.body.bio
+  };
+
+  db.insert(user)
+    .then(data => {
+      console.log(data);
+      res.status(201).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res
+        .status(500)
+        .json({
+          error: "There was an error while saving the user to the database"
+        })
+        .end();
+    });
+}
 
 function getUserById(req, res) {
   const { id } = req.params;
