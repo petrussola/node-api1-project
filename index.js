@@ -17,8 +17,6 @@ server.put("/api/users/:id", updateUser);
 server.get("*", handleDefaultRequest);
 
 function createNewUser(req, res) {
-  console.log(req);
-
   if (!req.body.name || !req.body.bio) {
     res
       .status(400)
@@ -32,11 +30,9 @@ function createNewUser(req, res) {
 
   db.insert(user)
     .then(data => {
-      console.log(data);
       res.status(201).json(data);
     })
     .catch(error => {
-      console.log(error);
       res
         .status(500)
         .json({
@@ -50,7 +46,6 @@ function getUserById(req, res) {
   const { id } = req.params;
   db.findById(id)
     .then(data => {
-      console.log(data);
       !data
         ? res
             .status(404)
@@ -58,7 +53,6 @@ function getUserById(req, res) {
         : res.json(data);
     })
     .catch(error => {
-      console.log(error);
       res
         .status(500)
         .json({ error: "The user information could not be retrieved." });
@@ -68,14 +62,12 @@ function getUserById(req, res) {
 function getAllUsers(req, res) {
   db.find()
     .then(data => {
-      console.log(data);
       res.json(data);
     })
     .catch(error => {
       res
         .status(500)
         .json({ error: "The users information could not be retrieved." });
-      console.log(error);
     });
 }
 
@@ -88,10 +80,8 @@ function deleteUser(req, res) {
             .status(404)
             .json({ message: "The user with the specified ID does not exist." })
         : res.json(data);
-      console.log(data);
     })
     .catch(error => {
-      console.log(error);
       res
         .status(500)
         .json({ error: "The user could not be removed" })
@@ -100,14 +90,23 @@ function deleteUser(req, res) {
 }
 
 function updateUser(req, res) {
-  const { body } = req;
   const { id } = req.params;
-  db.update(id, body)
+  db.update(id, req.body)
     .then(data => {
-      console.log(data);
+      if (!data) {
+        res
+          .status(404)
+          .json({ message: "The user with the specified ID does not exist." });
+      } else if (!req.body.name || !req.body.bio) {
+        res
+          .status(400)
+          .json({ errorMessage: "Please provide name and bio for the user." })
+          .end();
+      } else {
+        res.status(200).json(req.body);
+      }
     })
     .catch(error => {
-      console.log(error);
       res
         .status(500)
         .json({ error: "The user information could not be modified." })
