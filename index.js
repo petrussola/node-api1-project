@@ -12,6 +12,7 @@ server.use(express.json());
 server.post("/api/users", createNewUser);
 server.get("/api/users/:id", getUserById);
 server.get("/api/users", getAllUsers);
+server.delete("/api/users/:id", deleteUser);
 server.get("*", handleDefaultRequest);
 
 function createNewUser(req, res) {
@@ -74,6 +75,26 @@ function getAllUsers(req, res) {
         .status(500)
         .json({ error: "The users information could not be retrieved." });
       console.log(error);
+    });
+}
+
+function deleteUser(req, res) {
+  const { id } = req.params;
+  db.remove(id)
+    .then(data => {
+      !data
+        ? res
+            .status(404)
+            .json({ message: "The user with the specified ID does not exist." })
+        : res.json(data);
+      console.log(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res
+        .status(500)
+        .json({ error: "The user could not be removed" })
+        .end();
     });
 }
 
