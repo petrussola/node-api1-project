@@ -13,6 +13,7 @@ server.post("/api/users", createNewUser);
 server.get("/api/users/:id", getUserById);
 server.get("/api/users", getAllUsers);
 server.delete("/api/users/:id", deleteUser);
+server.put("/api/users/:id", updateUser);
 server.get("*", handleDefaultRequest);
 
 function createNewUser(req, res) {
@@ -95,6 +96,18 @@ function deleteUser(req, res) {
         .status(500)
         .json({ error: "The user could not be removed" })
         .end();
+    });
+}
+
+function updateUser(req, res) {
+  const { body } = req;
+  const { id } = req.params;
+  db.update(id, body)
+    .then(data => {
+      console.log(data);
+    })
+    .catch(error => {
+      console.log(error);
     });
 }
 
