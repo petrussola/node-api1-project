@@ -108,6 +108,10 @@ function updateUser(req, res) {
     })
     .catch(error => {
       console.log(error);
+      res
+        .status(500)
+        .json({ error: "The user information could not be modified." })
+        .end();
     });
 }
 
