@@ -19,6 +19,7 @@ function getAllUsers(req, res) {
         res.json(data)
     })
     .catch(error => {
+        res.status(500).json({ error: "The users information could not be retrieved." })
         console.log(error)
     })
 }
